@@ -1,0 +1,127 @@
+/* static/css/custom.css */
+
+/* ====================================================================
+   RPG-Themed Custom Styles: parchment textures, ornate borders, fantasy fonts
+   ==================================================================== */
+
+/* Import fantasy fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Press+Start+2P&display=swap');
+
+:root {
+  /* Palette */
+  --color-primary: #c9a66b; /* gold */
+  --color-secondary: #7d5a50; /* dark brown */
+  --color-accent: #d4af37; /* metallic gold */
+  --color-bg: #fbf5e9; /* parchment cream */
+  --color-card-bg: rgba(255, 255, 240, 0.8); /* translucent parchment */
+  --color-text: #3e2c1c; /* dark wood */
+  --color-muted: #776658; /* faded leather */
+
+  /* Shadows & Borders */
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md: 0 6px 8px rgba(0,0,0,0.3);
+  --border-radius: 0.25rem;
+  --border-thick: 4px;
+}
+
+/* Base styles */
+body {
+  background-color: var(--color-bg);
+  background-image: url('{% static "images/parchment-texture.jpg" %}');
+  background-size: cover;
+  font-family: 'Press Start 2P', cursive;
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: 'Cinzel Decorative', serif;
+  color: var(--color-secondary);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Links styled as aged scroll buttons */
+a, .btn {
+  font-family: 'Press Start 2P', cursive;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 0 var(--color-muted);
+  position: relative;
+  padding: 0.75rem 1.5rem;
+  border: var(--border-thick) solid var(--color-secondary);
+  background-color: var(--color-card-bg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+a:hover, .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background-color: rgba(255,255,240,1);
+  border-color: var(--color-accent);
+}
+
+/* Header with ornate border */
+header {
+  background: none;
+  padding: 2rem 1rem;
+  border-bottom: var(--border-thick) solid var(--color-secondary);
+  border-image: url('{% static "images/ornate-border.png" %}') 30 round;
+  text-align: center;
+}
+
+/* Footer as scroll edge */
+footer {
+  background: none;
+  padding: 1rem;
+  border-top: var(--border-thick) solid var(--color-secondary);
+  border-image: url('{% static "images/ornate-border.png" %}') 30 round;
+  font-size: 0.75rem;
+}
+
+/* Card containers: quests, achievements, habits */
+.card, .habit-card {
+  background-color: var(--color-card-bg);
+  border: var(--border-thick) solid var(--color-secondary);
+  border-image: url('{% static "images/card-frame.png" %}') 20 round;
+  border-radius: 0;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Progress bar as filled rune */
+.progress {
+  background: url('{% static "images/rune-bg.png" %}') repeat-x;
+  border: var(--border-thick) solid var(--color-secondary);
+  height: 1.25rem;
+  overflow: hidden;
+}
+.progress__bar {
+  background: linear-gradient(90deg, var(--color-accent), #b08b2c);
+  height: 100%;
+  transition: width 0.4s ease;
+}
+
+/* Avatar styled as portrait frame */
+.avatar {
+  border: var(--border-thick) solid var(--color-secondary);
+  border-image: url('{% static "images/portrait-frame.png" %}') 20 round;
+  border-radius: 0;
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Utility helpers */
+.text-muted { color: var(--color-muted); }
+.mt-4 { margin-top: 1rem; }
+.mb-4 { margin-bottom: 1rem; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.container { max-width: 1024px; margin: 0 auto; padding: 0 1rem; }
+
+/* Mobile responsive: adjust parchment padding */
+@media (max-width: 768px) {
+  body { background-position: center top; }
+  .container { padding: 0 0.5rem; }
+}

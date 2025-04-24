@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card">
+    <h2 class="text-xl mb-4">📝 Add New Habit</h2>
+    
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {{form.as_p}}
+
+      <button type="submit" class="btn btn-primary" >➕ Add Habit</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

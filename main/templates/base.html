@@ -12,7 +12,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
   <header class="bg-indigo-600 text-white p-4 flex justify-between items-center">
-    <h1 class="text-2xl font-bold">HabitQuest</h1>
+    <a href="{% url 'home'%}"> <h1 class="text-2xl font-bold">HabitQuest</h1> </a>
     {% if user.is_authenticated %}
       <div class="flex items-center space-x-4">
         <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="w-10 h-10 rounded-full">

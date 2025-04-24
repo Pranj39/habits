@@ -17,10 +17,10 @@
             <span class="text-sm text-green-600">🔥 {{ habit.streak }}-day streak</span>
           {% endif %}
         </div>
-        <form action="{% url 'complete_habit' habit.id %}" method="post">
+        <form action="{% url 'complete_habit' habit.id%}" method="post">
           {% csrf_token %}
           <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
-            ✓ +{{ habit.xp_reward }} XP
+            ✓ +{{ habit.exp_reward }} XP
           </button>
         </form>
       </li>
@@ -28,7 +28,7 @@
       <p class="text-gray-600">No habits scheduled for today. Add one to start earning XP!</p>
       {% endfor %}
     </ul>
-    <a href="" class="inline-block mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+    <a href="{% url 'habit' %}" class="inline-block mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
       + Add New Habit
     </a>
   </section>

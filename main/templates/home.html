@@ -3,65 +3,126 @@
 
 {% block title %}Dashboard - HabitQuest{% endblock %}
 
-{% block content %}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-  <!-- Habits List -->
-  <section class="md:col-span-2">
-    <h2 class="text-xl font-semibold mb-4">Today's Habits</h2>
-    <ul>
-      {% for habit in habits %}
-      <li class="bg-white rounded-lg shadow p-4 mb-4 flex justify-between items-center">
-        <div>
-          <h3 class="font-semibold text-lg">{{ habit.name }}</h3>
-          {% if habit.streak %}
-            <span class="text-sm text-green-600">🔥 {{ habit.streak }}-day streak</span>
-          {% endif %}
-        </div>
-        <form action="{% url 'complete_habit' habit.id%}" method="post">
-          {% csrf_token %}
-          <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
-            ✓ +{{ habit.exp_reward }} XP
-          </button>
-        </form>
-      </li>
-      {% empty %}
-      <p class="text-gray-600">No habits scheduled for today. Add one to start earning XP!</p>
-      {% endfor %}
-    </ul>
-    <a href="{% url 'habit' %}" class="inline-block mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-      + Add New Habit
-    </a>
-  </section>
 
-  <!-- Sidebar -->
-  <aside class="space-y-6">
-    <!-- Quest Log -->
-    <div class="bg-white rounded-lg shadow p-4">
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 th_contain">
+  <!-- Habits List -->
+  <div class="habits th_item">
+    <section class="md:col-span-2 bottom th_item_item">
+      <h2 class="text-xl font-semibold mb-4">Today's Habits</h2>
+      <ul>
+        {% for habit in habits %}
+        <li class="bg-white rounded-lg shadow p-4 mb-4 flex justify-between items-center">
+          {% if not habit.completed %}
+          <div>
+            <h3 class="font-semibold text-lg">{{ habit.name }}</h3>
+            {% if habit.streak %}
+            <span class="text-sm text-green-600">🔥 {{ habit.streak }}-day streak</span>
+            {% endif %}
+          </div>
+          <form action="{% url 'complete_habit' habit.id%}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+              ✓ +{{ habit.exp_reward }} XP
+            </button>
+          </form>
+          <form action="{% url 'edit_habit' habit.id%}">
+            {% csrf_token %}
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+              edit
+            </button>
+          </form>
+          {%endif%}
+        </li>
+        {% empty %}
+        <p class="text-gray-600">No habits scheduled for today. Add one to start earning XP!</p>
+        {% endfor %}
+      </ul>
+      <a href="{% url 'habit' %}"
+        class="inline-block mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+        + Add New Habit
+      </a>
+    </section>
+    <div class="bg-white rounded-lg shadow p-4 bottom th_item_item">
       <h2 class="font-semibold mb-3">Quest Log</h2>
       <ul class="list-disc list-inside">
         {% for quest in quests %}
-        <li class="mb-2">
-          <a href="{% url 'quest_detail' quest.id %}" class="text-indigo-600 hover:underline">{{ quest.title }}</a>
+        <li class="bg-white rounded-lg shadow p-4 mb-4 flex justify-between items-center">
+          {% if not quest.completed %}
+          <div>
+            <h3 class="font-semibold text-lg">{{ quest.name }}</h3>
+          </div>
+          <form action="{% url 'complete_quest' quest.id%}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+              ✓ +{{ quest.exp_reward }} XP
+            </button>
+          </form>
+          {%endif%}
         </li>
         {% empty %}
         <p class="text-gray-600">No active quests. Check back soon!</p>
         {% endfor %}
       </ul>
+      <a href="{% url 'quest' %}"
+        class="inline-block mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
+        + Add New Quest
+      </a>
     </div>
+  </div>
+  <!-- Sidebar -->
 
-    <!-- Achievements -->
-    <div class="bg-white rounded-lg shadow p-4">
-      <h2 class="font-semibold mb-3">Achievements</h2>
-      <div class="flex flex-wrap -m-1">
-        {% for badge in badges %}
-        <div class="p-1 w-1/4">
-          <img src="{{ badge.icon.url }}" alt="{{ badge.name }}" class="w-full rounded" title="{{ badge.name }}">
-        </div>
+  <div class="space-y-6 quests th_item">
+    <!-- Quest Log -->
+    
+
+    <section class="md:col-span-2 bottom th_item_item">
+      <h2 class="text-xl font-semibold mb-4">Completed Habits</h2>
+      <ul>
+        {% for habit in c_habits %}
+        <li class="bg-white rounded-lg shadow p-4 mb-4 flex justify-between items-center">
+          <div>
+            <h3 class="font-semibold text-lg">{{ habit.name }}</h3>
+          </div>
+          <form action="{% url 'uncomplete_habit' habit.id%}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+              X
+            </button>
+          </form>
+          <form action="{% url 'edit_habit' habit.id%}">
+            {% csrf_token %}
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+              edit
+            </button>
+          </form>
+        </li>
         {% empty %}
-        <p class="text-gray-600">Earn badges by completing habits and quests!</p>
+        <p class="text-gray-600">No habits completed</p>
         {% endfor %}
-      </div>
+      </ul>
+    </section>
+    <div class="bg-white rounded-lg shadow p-4 bottom th_item_item">
+      <h2 class="font-semibold mb-3">Completed Quests</h2>
+      <ul class="list-disc list-inside">
+        {% for quest in c_quests %}
+        <li class="bg-white rounded-lg shadow p-4 mb-4 flex justify-between items-center">
+          <div>
+            <h3 class="font-semibold text-lg">{{ quest.name }}</h3>
+          </div>
+          <form action="{% url 'uncomplete_quest' quest.id%}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+              X
+            </button>
+          </form>
+        </li>
+        {% empty %}
+        <p class="text-gray-600">No quests completed.</p>
+        {% endfor %}
+      </ul>
     </div>
-  </aside>
+</div>
+
 </div>
 {% endblock %}

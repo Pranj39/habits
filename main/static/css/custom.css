@@ -23,7 +23,27 @@
   --border-radius: 0.25rem;
   --border-thick: 4px;
 }
+.bottom{
+  padding-bottom: 2rem;
+  border-bottom: var(--border-thick) solid var(--color-secondary);
+}
+.th_contain{
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
 
+.th_item{
+  flex-basis: 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+}
+.th_item_item{
+  flex-basis: 0;
+  flex-grow: 1;
+
+}
 /* Base styles */
 body {
   background-color: var(--color-bg);
@@ -73,7 +93,6 @@ header {
 footer {
   background: none;
   padding: 1rem;
-  border-top: var(--border-thick) solid var(--color-secondary);
   border-image: url('{% static "images/ornate-border.png" %}') 30 round;
   font-size: 0.75rem;
 }
@@ -110,7 +129,6 @@ footer {
   width: 3rem;
   height: 3rem;
 }
-
 /* Utility helpers */
 .text-muted { color: var(--color-muted); }
 .mt-4 { margin-top: 1rem; }
@@ -118,7 +136,7 @@ footer {
 .flex { display: flex; }
 .items-center { align-items: center; }
 .justify-between { justify-content: space-between; }
-.container { max-width: 1024px; margin: 0 auto; padding: 0 1rem; }
+.container { max-width: 1920px; margin: 0 auto; padding: 0 1rem; }
 
 /* Mobile responsive: adjust parchment padding */
 @media (max-width: 768px) {

@@ -10,6 +10,7 @@
   <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
   <link href="{% static 'css/custom.css' %}" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100 min-h-screen ">
   <div>
     <header class="bg-indigo-600 text-white p-4 flex justify-between items-center">
@@ -36,5 +37,16 @@
       &copy; {{ now.year }} HabitQuest
     </footer>
   </div>
+  {%block scripts%}{%endblock%}
+  <script>
+    (function(){
+      // Only run once per session
+      if (!document.cookie.match(/tz=[^;]+/)) {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        // Set a cookie that your middleware can read
+        document.cookie = `tz=${tz}; path=/`;
+      }
+    })();
+  </script>
 </body>
 </html>

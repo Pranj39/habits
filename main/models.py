@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import timedelta, datetime
 from django.contrib.auth.models import User
+import pytz
 
 class UserProfile(models.Model):
     exp = models.PositiveIntegerField(default=0)
@@ -8,7 +9,11 @@ class UserProfile(models.Model):
     level = models.PositiveIntegerField(default=1)
     id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE,related_name='profile')
-
+    timezone = models.CharField(
+        max_length=32,
+        choices=[(tz, tz) for tz in pytz.common_timezones],
+        default='UTC'
+    )
     def __str__(self):
         return f"{self.user.username}'s Profile"
     
@@ -42,9 +47,9 @@ class Habit(models.Model):
     completed = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null= True)
     id = models.AutoField(primary_key=True)
-    streak = models.PositiveBigIntegerField(default=0)
-    reset = models.BooleanField(default=False)
-    time = models.TimeField(null=True)
+    streak = models.PositiveBigIntegerField(default=0, editable=False)
+    reset_time = models.TimeField(null=True)
+    needs_reset = models.BooleanField(default=False)
     def get_exp(self):
         return self.time_required * self.difficulty
 

@@ -7,6 +7,28 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .forms import HabitForm, MyUserCreationForm, QuestForm
 from .models import Habit, Quest
+from .serializers import HabitSerializer, UserProfileSerializer
+from rest_framework import generics, permissions
+
+
+
+class HabitListCreateView(generics.ListCreateAPIView):
+    serializer_class = HabitSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Habit.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class HabitDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = HabitSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Habit.objects.filter(user=self.request.user)
+
 
 @login_required
 def home(request):

@@ -13,4 +13,6 @@ urlpatterns = [
     path('reg',views.register,name='register'),
     path('log',views.login_,name='login'),
     path('logout',views.logout,name='logout'),
+    path('api/habits/', views.HabitListCreateView.as_view(), name='habit_list'),
+    path('api/habits/<int:pk>/', views.HabitDetailView.as_view(), name='habit_detail'),
 ]

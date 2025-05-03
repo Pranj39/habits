@@ -1,0 +1,7 @@
+djangorestframework
+celery
+redis
+django-celery-beat
+mysqlclient
+environs
+pytz

@@ -137,9 +137,44 @@ footer {
 .items-center { align-items: center; }
 .justify-between { justify-content: space-between; }
 .container { max-width: 1920px; margin: 0 auto; padding: 0 1rem; }
-
-/* Mobile responsive: adjust parchment padding */
 @media (max-width: 768px) {
-  body { background-position: center top; }
-  .container { padding: 0 0.5rem; }
+  body {
+    font-size: 10px;
+  }
+
+  h1, h2, h3 {
+    font-size: .3rem !important;
+  }
+
+  button,
+  a.btn,
+  .btn {
+    font-size: 0.2rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  li.flex {
+    flex-direction: row !important;
+    gap: 0.5rem;
+  }
+
+  .th_item {
+    flex-direction: column !important;
+  }
+
+  .th_item_item {
+    width: 100%;
+  }
+
+  form {
+    width: 100%;
+  }
+
+  form button {
+    width: 100%;
+  }
+
+  .container {
+    padding: 0.5rem;
+  }
 }

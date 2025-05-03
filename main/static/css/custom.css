@@ -139,22 +139,22 @@ footer {
 .container { max-width: 1920px; margin: 0 auto; padding: 0 1rem; }
 @media (max-width: 768px) {
   body {
-    font-size: 10px;
+    font-size: 0.65rem;
   }
 
   h1, h2, h3 {
-    font-size: .3rem !important;
+    font-size: 1rem !important;
   }
 
   button,
   a.btn,
   .btn {
-    font-size: 0.2rem;
+    font-size: 0.65rem;
     padding: 0.5rem 0.75rem;
   }
 
   li.flex {
-    flex-direction: row !important;
+    flex-direction: column !important;
     gap: 0.5rem;
   }
 

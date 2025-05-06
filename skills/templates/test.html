@@ -1,0 +1,53 @@
+<html>
+
+<head>
+
+</head>
+
+<body>
+    <div id="add"></div>
+
+</body>
+<script>
+    var tree_id = parseInt("{{tree_id|escapejs}}")
+    function make_list(name, n, my_dict) {
+
+        const new_ul = document.createElement('ul')
+        new_ul.id = name + n
+        document.getElementById(name).appendChild(new_ul)
+        console.log(new_ul.id)
+        var i = 1
+        for (let key in my_dict) {
+            value = my_dict[key]
+            if (key != 'id') {
+                const new_li = document.createElement('li')
+                new_li.innerHTML = key
+                new_ul.appendChild(new_li)
+            }
+
+
+            if (key == 'id') {
+                const form = document.createElement('li')
+                id = parseInt(my_dict[key])
+                form.innerHTML = `       
+                    <form method="post" action="/skills/${tree_id}/${id}">
+                        {%csrf_token%}
+                        <input type="text" id="name" name="name" >
+                        <button type="submit">SUBMIT</button>
+                    </form>
+                    `
+                new_ul.appendChild(form)
+
+            }
+            make_list(name + n, i, value)
+            i++
+        }
+        document.getElementById(name).appendChild(new_ul)
+    }
+    obj = JSON.parse('{{j|escapejs}}')
+    make_list('add', 1, obj)
+
+    document.getElementById('add').insertAdjacentHTML("beforebegin", `<pre>${JSON.stringify(obj, null, 4)}</pre>`)
+</script>
+
+</html>

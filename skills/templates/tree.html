@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON to Tree Diagram</title>
+  <style>
+    body { font-family: sans-serif; }
+    .node circle { fill: #fff; stroke: steelblue; stroke-width: 2px; cursor: pointer; }
+    .node circle.selected { fill: steelblue; }
+    .node text { font: 22px sans-serif; }
+    .link { fill: none; stroke: #ccc; stroke-width: 2px; }
+  </style>
+</head>
+<body>
+  <center><svg width="1300" height="600"></svg></center>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    var data = {}
+    const tree_id = parseInt("{{ tree_id|escapejs }}");
+    async function main() {
+    await fetch(`http://${window.location.host}/skills/api/skills/${tree_id}`)
+            .then(response=>response.json())
+            .then(dat => {
+                console.log(dat)
+                data = dat})
+            .catch(errors=>console.log(errors))
+        
+    
+    const element = document.createElement('h1')
+    element.textContent = data.skill_points
+    document.getElementsByTagName('body')[0].appendChild(element)
+
+    const svg = d3.select("svg"),
+          width = +svg.attr("width"),
+          height = +svg.attr("height");
+
+    console.log(window.location.host)
+    const root = d3.hierarchy(data.structure);
+    const treeLayout = d3.tree().size([height - 40, width - 340]);
+    treeLayout(root);
+
+    svg.append("g")
+      .selectAll("path")
+      .data(root.links())
+      .join("path")
+        .attr("class", "link")
+        .attr("d", d3.linkHorizontal()
+          .x(d => d.y + 180)
+          .y(d => d.x + 20)
+        );
+
+    const node = svg.append("g")
+      .selectAll("g")
+      .data(root.descendants(), d => d.data.id)
+      .join(
+          enter => enter.append("g").attr("class","node"),
+          update => update,
+          exit => exit.remove()
+        )
+        .attr("class", "node")
+        .attr("transform", d => `translate(${d.y + 180},${d.x + 20})`);
+
+    node.append("circle")
+        .attr("r", 12)
+        .classed("selected", d => d.data.activated)
+        .on("click", async function(event,d){
+        
+            const circle = d3.select(this);
+            const State = circle.classed("selected");
+            if(circle.classed("selected")){
+                if(!d.data.root_node){
+                    circle.classed("selected",!State);
+                    d.data.activated = !State;
+                    data.skill_points += 1
+                    element.innerText = data.skill_points
+                }
+            }else{
+                if(data.skill_points > 0){
+                    circle.classed("selected",!State);
+                    d.data.activated = !State;
+                    data.skill_points -= 1
+                    element.innerText = data.skill_points
+                }
+            }
+
+            const csrftoken = getCookie('csrftoken');
+
+
+            
+            try {
+                const resp = await fetch(
+                    `http://${window.location.host}/skills/api/skills/${tree_id}`,
+                    {
+                        method: 'PATCH',
+                        credentials: 'include',               
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken         
+                        },
+                        body: JSON.stringify({ skill_points: data.skill_points })
+                    }
+                );
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                console.log('Saved!', await resp.json());
+            } catch (err) {
+                console.error('Save failed:', err);
+                circle.classed('selected', State);
+                data.skill_points += 1
+                element.innerText = data.skill_points
+                d.data.activated = State;
+            }
+
+
+            try {
+                const resp = await fetch(
+                    `http://${window.location.host}/skills/api/nodes/${d.data.id}`,
+                    {
+                        method: 'PATCH',
+                        credentials: 'include',               
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken         
+                        },
+                        body: JSON.stringify({ activated: d.data.activated })
+                    }
+                );
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                console.log('Saved!', await resp.json());
+            } catch (err) {
+                console.error('Save failed:', err);
+                circle.classed('selected', State);
+                data.skill_points += 1
+                element.innerText = data.skill_points
+                d.data.activated = State;
+            }
+        });
+
+    node.append("text")
+      .attr("dx", 3)
+      .attr("y", d => d.children ? -20 : 20)
+      .style("text-anchor", d => d.children ? "end" : "start")
+      .text(d => d.data.name);
+
+    }
+    function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                document.cookie.split(';').forEach(cookie => {
+                    const [key, val] = cookie.trim().split('=');
+                    if (key === name) cookieValue = decodeURIComponent(val);
+                });
+            }
+            return cookieValue;
+        }
+    main();
+  </script>
+</body>
+</html>

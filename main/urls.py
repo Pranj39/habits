@@ -1,4 +1,5 @@
 from django.urls import path, include
+from rest_framework.authtoken.views import obtain_auth_token
 from .import views
 urlpatterns = [
     path('', views.home, name='home'),
@@ -14,5 +15,6 @@ urlpatterns = [
     path('log',views.login_,name='login'),
     path('logout',views.logout,name='logout'),
     path('api/habits/', views.HabitListCreateView.as_view(), name='habit_list'),
+    path('api/token-auth/', obtain_auth_token),
     path('api/habits/<int:pk>/', views.HabitDetailView.as_view(), name='habit_detail'),
 ]

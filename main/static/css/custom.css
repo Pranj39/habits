@@ -96,7 +96,29 @@ footer {
   border-image: url('{% static "images/ornate-border.png" %}') 30 round;
   font-size: 0.75rem;
 }
-
+.skill-form {
+  background-color: var(--color-bg);
+  padding: 0.75rem;
+  border: var(--border-thick) solid var(--color-secondary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  margin-top: 0.5rem;
+}
+.form-game input,
+.form-game button {
+  font-family: 'Press Start 2P', cursive;
+}
+.form-game button {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-accent);
+  padding: 0.5rem 1rem;
+  flex-shrink: 4;
+  margin-left: 0.5rem;
+}
+.form-game button:hover {
+  background-color: var(--color-accent);
+}
 /* Card containers: quests, achievements, habits */
 .card, .habit-card {
   background-color: var(--color-card-bg);
@@ -203,3 +225,65 @@ footer {
     }
   }
   
+/* RPG-Styled Nested Lists */
+.nested-list {
+  padding-left: 1rem;
+  margin-top: 1rem;
+  border-left: var(--border-thick) solid var(--color-secondary);
+}
+.nested-list > li {
+  background-color: var(--color-card-bg);
+  border: var(--border-thick) solid var(--color-secondary);
+  border-radius: var(--border-radius);
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+.nested-list > li:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Indent deeper levels */
+.nested-list .nested-list {
+  margin-top: 0.5rem;
+  padding-left: 1rem;
+  border-color: var(--color-accent);
+}
+
+/* Themed form cards */
+.skill-form {
+  background-color: var(--color-bg);
+  padding: 0.75rem;
+  border: var(--border-thick) solid var(--color-secondary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  margin-top: 0.5rem;
+}
+.skill-form input,
+.skill-form button {
+  font-family: 'Press Start 2P', cursive;
+}
+.skill-form button {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-accent);
+  padding: 0.5rem 1rem;
+  flex-shrink: 4;
+  margin-left: 0.5rem;
+}
+.skill-form button:hover {
+  background-color: var(--color-accent);
+}
+.skill-form form {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+}
+
+.skill-form form > * {
+  width: 100%;
+  box-sizing: border-box;  /* include padding/border in total width */
+}

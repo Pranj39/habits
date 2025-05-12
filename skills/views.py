@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from .models import Tree, Node
 from .serializers import TreeSerializer, NodeSerializer
 from rest_framework import generics,permissions
+from rest_framework.authtoken.models import Token
 import json
 # Create your views here.
 
@@ -55,17 +56,17 @@ def tree_(request, tree_id, id):
     parent_node = Node.objects.filter(id=id).first()
     tree = Tree.objects.filter(id=tree_id).first()
     if request.method == "POST":
-        node = Node(name=request.POST['name'], parent=parent_node, tree=tree, user=request.user)
+        node = Node(name=request.POST['name'], time_required= int(request.POST['time_required']), difficulty=int(request.POST['difficulty']), parent=parent_node, tree=tree, user=request.user)
         node.save()
         node.tree.structure = node.tree.root_node.get_c()
         node.tree.save()
         return redirect('test', tree_id=tree_id)
-    return render(request,'test.html', context={'nodes':Node.objects.all(),'tree_id':tree_id,'j':tree.structure})
+    return render(request,'skills/test.html', context={'nodes':Node.objects.all(),'tree_id':tree_id,'j':tree.structure,'token':Token.objects.filter(user=request.user).first().key})
 
 
 def display(request, tree_id):
     tree = Tree.objects.filter(id=tree_id).first()
-    return render(request,'tree.html', context={'nodes':Node.objects.all(),'tree_id':tree_id,'j':tree.structure})
+    return render(request,'skills/tree.html', context={'nodes':Node.objects.all(),'tree_id':tree_id,'j':tree.structure,'token':Token.objects.filter(user=request.user)})
 
 
 def tree(request, tree_id):
@@ -82,7 +83,7 @@ def tree(request, tree_id):
         tree.save()
         nodes = tree.node.all()
     
-    return render(request,'test.html', context={'nodes':nodes,'tree_id':tree_id,'j':json.dumps(tree.structure),'tree':tree.node})
+    return render(request,'skills/test.html', context={'nodes':nodes,'tree_id':tree_id,'j':json.dumps(tree.structure),'tree':tree.node,'token':Token.objects.filter(user=request.user).first().key})
 
 def create_trees(request):
 
@@ -90,4 +91,4 @@ def create_trees(request):
         tree = Tree(name=request.POST['tree_name'], user = request.user)
         tree.save()
         return redirect('trees')
-    return render(request,'skills.html',context={'trees':Tree.objects.all()})
+    return render(request,'skills/skills.html',context={'trees':Tree.objects.filter(user=request.user),'token':Token.objects.filter(user=request.user)})

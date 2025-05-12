@@ -1,0 +1,89 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+  {{ token.key }}
+  <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+  <div>
+    <br>
+    <br><center>
+  <a href ="{%url 'display' tree_id%}">Display</a></center>
+    <br>
+    <br>
+  </div>
+  <div id="add" class="p-4"></div>
+{% endblock %}
+
+{%block scripts%}
+<script>
+    const tree_id = parseInt("{{ tree_id|escapejs }}");
+    const csrfToken = document.getElementById("csrf-token").value;
+    var obj = {}
+    function make_list(name, n, my_dict) {
+        const new_ul = document.createElement('ul');
+        new_ul.id = name + n;
+        new_ul.className = 'nested-list';   
+        const parentEl = document.getElementById(name);
+
+        if (!parentEl) {
+            console.error('Parent element ' + name + ' not found for new_ul ' + new_ul.id);
+            return;
+        }
+        parentEl.appendChild(new_ul);
+
+        var node_name = ''
+        for (let key in my_dict) {
+            const value = my_dict[key];
+            if (key==='name'){
+                const new_li = document.createElement('li');
+                new_li.textContent = value;
+                new_li.className = 'p-3 bg-white rounded shadow hover:shadow-md transition';
+                new_ul.appendChild(new_li);
+                node_name = value
+
+            }
+            if (key==='id'){
+                    const form_li = document.createElement('li');
+                    form_li.className = 'skill-form';
+                    const id_val = parseInt(value);
+
+                    form_li.innerHTML = `
+                        <form method="post" id = "${id_val}" action="/skills/${tree_id}/${id_val}/">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                            <input type="text" name="name" required placeholder="Name for child of ${node_name}">
+                            <input size="20" type="number" name="difficulty" min="1" max="10" required placeholder="Difficulty">
+                            <input type="number" name="time_required" required placeholder="Time Required (in minutes)">
+                            <button type="submit">SUBMIT</button>
+                        </form>
+                    `;
+                    new_ul.appendChild(form_li);
+
+            }
+            if (key === 'children') {
+                let i = 1;
+                value.forEach(element => {
+                        i++;
+                        make_list(name+n,i,element)
+                    });
+            }
+        }
+    }
+    async function get_data(){
+        token = "{{token|escapejs}}"
+        await fetch(`https://${window.location.host}/skills/api/skills/${tree_id}`,{method:'GET', headers:{
+            'Authorization':`Token ${token}`
+        }})
+            .then(response => response.json())
+            .then(data => obj = data)
+            .catch(error=>console.log(error));
+        make_list('add', 1, obj.structure);
+    const addDiv = document.getElementById('add');
+
+/*     if (addDiv) {
+        addDiv.insertAdjacentHTML("beforebegin", `<pre>${JSON.stringify(obj, null, 4)}</pre>`);
+    } */
+
+    }
+    get_data()
+</script>
+{%endblock%}

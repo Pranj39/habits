@@ -9,6 +9,7 @@ from .forms import HabitForm, MyUserCreationForm, QuestForm
 from .models import Habit, Quest
 from .serializers import HabitSerializer, UserProfileSerializer
 from rest_framework import generics, permissions
+from rest_framework.authtoken.models import Token
 
 
 
@@ -32,28 +33,26 @@ class HabitDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 @login_required
 def home(request):
-    t = loader.get_template('home.html')
-    
     habits = Habit.objects.filter(user = request.user)
     com_habits = Habit.objects.filter(completed= True, user=request.user)
     quests = Quest.objects.filter(user= request.user)
     com_quests = Quest.objects.filter(completed=True, user = request.user)
-    return render(request, 'home.html', context={'habits':habits, 'c_habits':com_habits,'quests':quests,'c_quests':com_quests})
+    return render(request, 'main/home.html', context={'habits':habits, 'c_habits':com_habits,'quests':quests,'c_quests':com_quests})
 
 
 @login_required
 def add_habits(request):
     if request.method == 'POST':
-        form = HabitForm(request.POST)
-        if form.is_valid:
+        form = HabitForm(request.POST, user=request.user)
+        if form.is_valid():
 
             instance = form.save()
             instance.user = request.user
             instance.save()
             return redirect('home')
         else:
-            form = HabitForm()
-    return render(request, 'add_habit.html', context={'form':HabitForm()})
+            form = HabitForm(user=request.user)
+    return render(request, 'main/add_habit.html', context={'form':HabitForm(user=request.user)})
 
 def edit_habits(request, id):
     habit = get_object_or_404(Habit, id=id)
@@ -65,7 +64,7 @@ def edit_habits(request, id):
     else:
         form = HabitForm(instance=habit)
 
-    return render(request, 'edit_habit.html', {
+    return render(request, 'main/edit_habit.html', {
         'form': form,
         'habit': habit,
     })
@@ -85,7 +84,7 @@ def add_quests(request):
         else:
             form = QuestForm()
             
-    return render(request, 'add_quest.html', context={'form':QuestForm()})
+    return render(request, 'main/add_quest.html', context={'form':QuestForm()})
 
 def complete_habit(request, id):
 
@@ -96,6 +95,10 @@ def complete_habit(request, id):
         habit.user.profile.level_up()
         habit.user.profile.save()
         print(habit.user.profile.exp)
+        for skill in habit.skills.all():
+            skill.exp += habit.exp_reward
+            skill.skill_points += habit.exp_reward
+            skill.save()
         habit.save()
     return redirect('home')
 
@@ -113,6 +116,12 @@ def uncomplete_habit(request, id):
         habit.user.profile.exp -= habit.get_exp()
         habit.user.profile.level_down()
         habit.user.profile.save()
+        print('hello')
+        for skill in habit.skills.all():
+            skill.exp -= habit.get_exp()
+            skill.skill_points -= habit.get_exp()
+            skill.save()
+            
         habit.save()
     return redirect('home')
 
@@ -145,20 +154,19 @@ def register(request):
         if form.is_valid():
             form.save()
             return redirect('login')
-    return render(request, 'register.html', context={'form':MyUserCreationForm})
+    return render(request, 'main/register.html', context={'form':MyUserCreationForm})
 
 def login_(request):
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)  
-        if user is not None:
-            auth_login(request, user)
-            return redirect('home')
-        else:
-            return render(request, 'login.html', context={'form':AuthenticationForm})
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            auth_login(request, user)  
+            token, created = Token.objects.get_or_create(user=user)
+            return redirect('home')  
     else:
-            return render(request, 'login.html', context={'form':AuthenticationForm})
+        form = AuthenticationForm()
+    return render(request, 'main/login.html', {'form': form})
     
     
 def logout(request):

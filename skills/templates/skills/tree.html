@@ -1,0 +1,182 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold text-indigo-700 mb-4">Skill Tree Diagram</h1>
+    <div class="bg-white rounded-lg shadow p-4">
+        <div class="text-xl font-semibold text-center text-indigo-600 mb-4">
+            Skill Points: <span id="skill-points" class="font-bold">Loading...</span>
+        </div>
+        <div class="overflow-auto">
+            <svg width="1300" height="600"></svg>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+    const tree_id = parseInt("{{ tree_id|escapejs }}");
+    let data = {};
+    const skillPointsEl = document.getElementById('skill-points');
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            document.cookie.split(';').forEach(cookie => {
+                const [key, val] = cookie.trim().split('=');
+                if (key === name) cookieValue = decodeURIComponent(val);
+            });
+        }
+        return cookieValue;
+    }
+
+    async function main() {
+        try {
+            const resp = await fetch(`https://${window.location.host}/skills/api/skills/${tree_id}`);
+            data = await resp.json();
+        } catch (e) {
+            console.error("Failed to fetch skill data:", e);
+            return;
+        }
+
+        skillPointsEl.textContent = data.skill_points;
+
+        const svg = d3.select("svg"),
+              width = +svg.attr("width"),
+              height = +svg.attr("height");
+
+        const root = d3.hierarchy(data.structure);
+        const treeLayout = d3.tree().size([height - 40, width - 340]);
+        treeLayout(root);
+
+        svg.append("g")
+            .selectAll("path")
+            .data(root.links())
+            .join("path")
+            .attr("class", "link")
+            .attr("d", d3.linkHorizontal()
+                .x(d => d.y + 180)
+                .y(d => d.x + 20)
+            )
+            .attr("stroke", "#ccc")
+            .attr("stroke-width", 2)
+            .attr("fill", "none");
+
+        const node = svg.append("g")
+            .selectAll("g")
+            .data(root.descendants(), d => d.data.id)
+            .join("g")
+            .attr("class", "node")
+            .attr("transform", d => `translate(${d.y + 180},${d.x + 20})`);
+
+        node.append("circle")
+            .attr("r", 12)
+            .attr("id", d => `circle-${d.data.id}`)
+            .attr("fill", d => d.data.activated ? "steelblue" : "#fff")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 2)
+            .style("cursor", "pointer")
+            .on("click", async function (event, d) {
+                if (d.parent && !d.parent.data.activated && !d.data.activated) {
+                    alert("You must activate the parent node first.");
+                    return;
+                }
+                if (d.data.root_node) {
+                    alert("Root Node can't be disabled");
+                    return;
+                }
+                if ((data.skill_points - d.data.skill_points_required) < 0 && !d.data.activated) {
+                    alert('Not enough skill points.');
+                    return;
+                }
+
+                const newState = !d.data.activated;
+                d.data.activated = newState;
+
+                if (newState && d.parent && d.parent.data.activated) {
+                    data.skill_points -= d.data.skill_points_required;
+                } else if (!newState) {
+                    data.skill_points += d.data.skill_points_required;
+                }
+
+                if (data.skill_points < 0) data.skill_points = 0;
+                skillPointsEl.textContent = data.skill_points;
+
+                const csrftoken = getCookie('csrftoken');
+
+                try {
+                    await fetch(
+                        `https://${window.location.host}/skills/api/nodes/${d.data.id}`,
+                        {
+                            method: 'PATCH',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrftoken
+                            },
+                            body: JSON.stringify({ activated: newState })
+                        }
+                    );
+                } catch (err) {
+                    console.error("Failed to update node:", err);
+                }
+
+                d3.select(this)
+                    .attr("fill", newState ? "steelblue" : "#fff");
+
+                if (!newState) {
+                    for (const desc of d.descendants().slice(1)) {
+                        if (desc.data.activated) {
+                            data.skill_points += desc.data.skill_points_required;
+                        }
+                        desc.data.activated = false;
+                        d3.select(`#circle-${desc.data.id}`)
+                            .attr("fill", "#fff");
+                        await fetch(
+                            `https://${window.location.host}/skills/api/nodes/${desc.data.id}`,
+                            {
+                                method: 'PATCH',
+                                credentials: 'include',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': csrftoken
+                                },
+                                body: JSON.stringify({ activated: false })
+                            }
+                        );
+                    }
+                    skillPointsEl.textContent = data.skill_points;
+                }
+
+                try {
+                    await fetch(
+                        `https://${window.location.host}/skills/api/skills/${tree_id}`,
+                        {
+                            method: 'PATCH',
+                            credentials: 'include',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrftoken
+                            },
+                            body: JSON.stringify({ skill_points: data.skill_points })
+                        }
+                    );
+                } catch (err) {
+                    console.error('Failed to save skill points:', err);
+                }
+            });
+
+        node.append("text")
+            .attr("dx", 3)
+            .attr("y", d => d.children ? -20 : 20)
+            .style("text-anchor", d => d.children ? "end" : "start")
+            .style("font", "16px sans-serif")
+            .text(d => `${d.data.name} (Exp: ${d.data.skill_points_required})`);
+    }
+
+    main();
+</script>
+{% endblock %}

@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import timedelta, datetime
 from django.contrib.auth.models import User
+from skills.models import Tree
 import pytz
 
 class UserProfile(models.Model):
@@ -43,22 +44,24 @@ class Habit(models.Model):
     name = models.CharField(max_length=255, default="default_habit")
     exp_reward = models.PositiveBigIntegerField()
     time_required = models.PositiveBigIntegerField()
-    difficulty = models.PositiveSmallIntegerField()
+    difficulty = models.SmallIntegerField()
     completed = models.BooleanField(default=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null= True)
     id = models.AutoField(primary_key=True)
     streak = models.PositiveBigIntegerField(default=0, editable=False)
     reset_time = models.TimeField(null=True)
     needs_reset = models.BooleanField(default=False)
+    skills = models.ManyToManyField(Tree, null=True)
+
+
     def get_exp(self):
         return self.time_required * self.difficulty
 
     def save(self, *args, **kwargs):
-        
         self.exp_reward = self.get_exp()
-        
+        habit = super().save(*args, **kwargs)
 
-        return super().save(*args, **kwargs)
+        return habit
 
 class Quest(models.Model):
     name = models.CharField(max_length=255, default="default_habit")

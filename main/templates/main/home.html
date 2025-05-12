@@ -1,5 +1,5 @@
 <!-- templates/home.html -->
-{% extends 'base.html' %}
+{% extends 'main/base.html' %}
 
 {% block title %}Dashboard - HabitQuest{% endblock %}
 
@@ -20,13 +20,13 @@
             <span class="text-sm text-green-600">🔥 {{ habit.streak }}-day streak</span>
             {% endif %}
           </div>
-          <form action="{% url 'complete_habit' habit.id%}" method="post">
+          <form class="form-game" action="{% url 'complete_habit' habit.id%}" method="post">
             {% csrf_token %}
             <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
               ✓ +{{ habit.exp_reward }} XP
             </button>
           </form>
-          <form action="{% url 'edit_habit' habit.id%}">
+          <form class="form-game"  action="{% url 'edit_habit' habit.id%}">
             {% csrf_token %}
             <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
               edit
@@ -52,7 +52,7 @@
           <div>
             <h3 class="font-semibold text-lg">{{ quest.name }}</h3>
           </div>
-          <form action="{% url 'complete_quest' quest.id%}" method="post">
+          <form class="form-game" action="{% url 'complete_quest' quest.id%}" method="post">
             {% csrf_token %}
             <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
               ✓ +{{ quest.exp_reward }} XP
@@ -84,13 +84,13 @@
           <div>
             <h3 class="font-semibold text-lg">{{ habit.name }}</h3>
           </div>
-          <form action="{% url 'uncomplete_habit' habit.id%}" method="post">
+          <form class="form-game"  action="{% url 'uncomplete_habit' habit.id%}" method="post">
             {% csrf_token %}
             <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
               X
             </button>
           </form>
-          <form action="{% url 'edit_habit' habit.id%}">
+          <form class="form-game"  action="{% url 'edit_habit' habit.id%}">
             {% csrf_token %}
             <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
               edit

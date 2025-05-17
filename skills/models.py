@@ -7,7 +7,7 @@ class Tree(models.Model):
     def __str__(self):
         return self.name
     
-    name = models.CharField(max_length=255, default='NAME')
+    name = models.CharField(max_length=45, default='NAME')
     id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     root_node = models.OneToOneField('Node', on_delete=models.CASCADE, null=True,related_name='parent_tree')
@@ -23,7 +23,7 @@ class Tree(models.Model):
 
 
 class Node(models.Model):
-    name = models.CharField(max_length=255, default='NAME_NODE')
+    name = models.CharField(max_length=45, default='NAME_NODE')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     tree = models.ForeignKey(Tree,on_delete=models.CASCADE,related_name='node')

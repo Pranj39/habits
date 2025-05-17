@@ -8,9 +8,11 @@
         <div class="text-xl font-semibold text-center text-indigo-600 mb-4">
             Skill Points: <span id="skill-points" class="font-bold">Loading...</span>
         </div>
+        <center>
         <div class="overflow-auto">
-            <svg width="1300" height="600"></svg>
+            <svg width="2400" height="600"></svg>
         </div>
+        </center>
     </div>
 </div>
 {% endblock %}
@@ -49,13 +51,14 @@
               height = +svg.attr("height");
 
         const root = d3.hierarchy(data.structure);
-        const treeLayout = d3.tree().size([height - 40, width - 340]);
+        const treeLayout = d3.tree().size([height - 40, width - 0.3*width]);
         treeLayout(root);
 
         svg.append("g")
             .selectAll("path")
             .data(root.links())
             .join("path")
+            .attr("transform", d=>`translate(250,0)`)
             .attr("class", "link")
             .attr("d", d3.linkHorizontal()
                 .x(d => d.y + 180)
@@ -68,6 +71,7 @@
         const node = svg.append("g")
             .selectAll("g")
             .data(root.descendants(), d => d.data.id)
+            .attr("transform", d=>`translate(250,0)`)
             .join("g")
             .attr("class", "node")
             .attr("transform", d => `translate(${d.y + 180},${d.x + 20})`);
@@ -78,6 +82,7 @@
             .attr("fill", d => d.data.activated ? "steelblue" : "#fff")
             .attr("stroke", "steelblue")
             .attr("stroke-width", 2)
+            .attr("transform", d=>`translate(250,0)`)
             .style("cursor", "pointer")
             .on("click", async function (event, d) {
                 if (d.parent && !d.parent.data.activated && !d.data.activated) {
@@ -173,8 +178,10 @@
             .attr("dx", 3)
             .attr("y", d => d.children ? -20 : 20)
             .style("text-anchor", d => d.children ? "end" : "start")
+            .attr("transform", d=>`translate(250,0)`)
             .style("font", "16px sans-serif")
             .text(d => `${d.data.name} (Skill Points: ${d.data.skill_points_required})`);
+        
     }
 
     main();

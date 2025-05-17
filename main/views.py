@@ -57,12 +57,12 @@ def add_habits(request):
 def edit_habits(request, id):
     habit = get_object_or_404(Habit, id=id)
     if request.method == 'POST':
-        form = HabitForm(request.POST, instance=habit)        
+        form = HabitForm(request.POST, instance=habit,user=request.user)        
         if form.is_valid():
             form.save()
             return redirect('home')
     else:
-        form = HabitForm(instance=habit)
+        form = HabitForm(instance=habit, user=request.user)
 
     return render(request, 'main/edit_habit.html', {
         'form': form,

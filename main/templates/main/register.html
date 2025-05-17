@@ -7,9 +7,15 @@
 <div class="flex justify-center items-center min-h-screen bg-gray-100">
   <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
     <h2 class="text-2xl font-bold text-center mb-6">Join HabitQuest</h2>
-    <form action="{%url 'register'%}" method="post" class="space-y-4">
+    <form action="{%url 'register'%}" method="post" class="space-y-4 form-game">
       {% csrf_token %}
-      {{ form.non_field_errors }}
+      <ul>
+      {%for field,errors in form.errors.items %}
+        {%for error in errors%}
+          <li>{{error}}</li>
+        {%endfor%}
+
+      {%endfor%}</ul>
       <div>
         <label for="id_username" class="block text-sm font-medium">Username</label>
         {{ form.username|add_class:"w-full px-3 py-2 border rounded" }}

@@ -154,6 +154,8 @@ def register(request):
         if form.is_valid():
             form.save()
             return redirect('login')
+        else:
+            return render(request, 'main/register.html', context={'form':form})
     return render(request, 'main/register.html', context={'form':MyUserCreationForm})
 
 def login_(request):
@@ -164,6 +166,8 @@ def login_(request):
             auth_login(request, user)  
             token, created = Token.objects.get_or_create(user=user)
             return redirect('home')  
+        else:
+            return render(request, 'main/login.html',{'form':form})
     else:
         form = AuthenticationForm()
     return render(request, 'main/login.html', {'form': form})

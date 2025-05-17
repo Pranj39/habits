@@ -21,6 +21,11 @@ class HabitForm(forms.ModelForm):
             'difficulty':forms.NumberInput(attrs={'max':'10','min':'1'}),
             'reset_time':forms.TimeInput(attrs={'type':'time'})
         }
+
+        labels = {
+            'time_required': 'Time Required (in minutes)',
+            'difficulty':'Difficulty (1-10)'
+        }
     def __init__(self, *args, **kwargs):
        user = kwargs.pop('user', None)
        super().__init__(*args, **kwargs)

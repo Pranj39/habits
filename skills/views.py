@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect
 from .models import Tree, Node
 from .serializers import TreeSerializer, NodeSerializer
 from rest_framework import generics,permissions
+from django.contrib.auth.decorators import login_required
 from rest_framework.authtoken.models import Token
 import json
 # Create your views here.
@@ -52,6 +53,7 @@ class NodeDetailView(generics.RetrieveUpdateDestroyAPIView):
         tree.structure = tree.root_node.get_c()
         tree.save()
 
+@login_required
 def tree_(request, tree_id, id):
     parent_node = Node.objects.filter(id=id).first()
     tree = Tree.objects.filter(id=tree_id).first()
@@ -60,15 +62,15 @@ def tree_(request, tree_id, id):
         node.save()
         node.tree.structure = node.tree.root_node.get_c()
         node.tree.save()
-        return redirect('test', tree_id=tree_id)
-    return render(request,'skills/test.html', context={'nodes':Node.objects.all(),'tree_id':tree_id,'j':tree.structure,'token':Token.objects.filter(user=request.user).first().key})
+        return redirect('edit_tree', tree_id=tree_id)
+    return render(request,'skills/edit_tree.html', context={'nodes':Node.objects.all(),'tree_id':tree_id,'j':tree.structure,'token':Token.objects.filter(user=request.user).first().key})
 
-
+@login_required
 def display(request, tree_id):
     tree = Tree.objects.filter(id=tree_id).first()
     return render(request,'skills/tree.html', context={'nodes':Node.objects.all(),'tree_id':tree_id,'j':tree.structure,'token':Token.objects.filter(user=request.user)})
 
-
+@login_required
 def tree(request, tree_id):
     tree = Tree.objects.filter(id=tree_id).first()
     if tree.node.all():
@@ -83,8 +85,9 @@ def tree(request, tree_id):
         tree.save()
         nodes = tree.node.all()
     
-    return render(request,'skills/test.html', context={'nodes':nodes,'tree_id':tree_id,'j':json.dumps(tree.structure),'tree':tree.node,'token':Token.objects.filter(user=request.user).first().key})
+    return render(request,'skills/edit_tree.html', context={'nodes':nodes,'tree_id':tree_id,'j':json.dumps(tree.structure),'tree':tree.node,'token':Token.objects.filter(user=request.user).first().key})
 
+@login_required
 def create_trees(request):
 
     if request.method == 'POST':

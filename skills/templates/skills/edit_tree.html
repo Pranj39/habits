@@ -70,7 +70,7 @@
     }
     async function get_data(){
         token = "{{token|escapejs}}"
-        await fetch(`https://${window.location.host}/skills/api/skills/${tree_id}`,{method:'GET', headers:{
+        await fetch(`http://${window.location.host}/skills/api/skills/${tree_id}`,{method:'GET', headers:{
             'Authorization':`Token ${token}`
         }})
             .then(response => response.json())

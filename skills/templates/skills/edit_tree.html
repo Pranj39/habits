@@ -8,6 +8,10 @@
     <br>
     <br><center>
   <a href ="{%url 'display' tree_id%}">Display</a></center>
+  <center>
+    <br>
+    <br>
+  <a href ="{%url 'delete_tree' tree_id%}">Delete</a></center>
     <br>
     <br>
   </div>
@@ -32,31 +36,37 @@
         parentEl.appendChild(new_ul);
 
         var node_name = ''
+        const new_li = document.createElement('li');
+        new_li.className = 'p-3 bg-white rounded shadow hover:shadow-md transition skill-name';
         for (let key in my_dict) {
             const value = my_dict[key];
             if (key==='name'){
-                const new_li = document.createElement('li');
-                new_li.textContent = value;
-                new_li.className = 'p-3 bg-white rounded shadow hover:shadow-md transition';
-                new_ul.appendChild(new_li);
+                name_ = document.createElement('div')
+                name_.innerHTML = `${value}`
+                new_li.appendChild(name_)
+                
                 node_name = value
 
             }
             if (key==='id'){
-                    const form_li = document.createElement('li');
-                    form_li.className = 'skill-form';
-                    const id_val = parseInt(value);
+                edit_button = document.createElement('div')
+                edit_button.innerHTML = `<a href="http://${window.location.host}/skills/edit_node/${value}">EDIT</a>`
+                new_li.appendChild(edit_button)
+                const form_li = document.createElement('li');
+                form_li.className = 'skill-form';
+                const id_val = parseInt(value);
 
-                    form_li.innerHTML = `
-                        <form method="post" id = "${id_val}" action="/skills/${tree_id}/${id_val}/">
-                            <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
-                            <input type="text" name="name" required placeholder="Name for child of ${node_name}">
-                            <input size="20" type="number" name="difficulty" min="1" max="10" required placeholder="Difficulty">
-                            <input type="number" name="time_required" required placeholder="Time Required (in minutes)">
-                            <button type="submit">SUBMIT</button>
-                        </form>
-                    `;
-                    new_ul.appendChild(form_li);
+                form_li.innerHTML = `
+                    <form method="post" id = "${id_val}" action="/skills/${tree_id}/${id_val}/">
+                        <input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">
+                        <input type="text" name="name" required placeholder="Name for child of ${node_name}">
+                        <input size="20" type="number" name="difficulty" min="1" max="10" required placeholder="Difficulty">
+                        <input type="number" name="time_required" required placeholder="Time Required (in minutes)">
+                        <button type="submit">SUBMIT</button>
+                    </form>
+                `;
+                new_ul.appendChild(new_li);
+                new_ul.appendChild(form_li);
 
             }
             if (key === 'children') {

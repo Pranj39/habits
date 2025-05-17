@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from .models import Tree, Node
+from .forms import NodeForm
 from .serializers import TreeSerializer, NodeSerializer
 from rest_framework import generics,permissions
 from django.contrib.auth.decorators import login_required
@@ -95,3 +96,29 @@ def create_trees(request):
         tree.save()
         return redirect('trees')
     return render(request,'skills/skills.html',context={'trees':Tree.objects.filter(user=request.user),'token':Token.objects.filter(user=request.user)})
+
+@login_required
+def delete_trees(request, tree_id):
+
+        tree = Tree.objects.filter(id=tree_id)
+        tree.delete()
+        return redirect('trees')
+   
+
+def edit_nodes(request, node_id):
+    node = Node.objects.filter(id=node_id).first()
+    if request.method == "POST":
+        node_form = NodeForm(request.POST, instance=node)
+        if node_form.is_valid():
+            node_form.save()
+            node.tree.structure = node.tree.root_node.get_c()
+            if node.root_node == True:
+                node.tree.name = request.POST['name']
+            node.tree.save()
+            return redirect('edit_tree', tree_id=node.tree.id)
+        else:
+            return render(request, 'skills/edit_node',{'node_form': node_form,'node':node})
+    else:
+        node_form = NodeForm(instance=node)
+        return render(request,'skills/edit_node.html', {'node':node,'node_form':node_form})
+        

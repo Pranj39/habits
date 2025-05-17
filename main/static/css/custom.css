@@ -283,6 +283,10 @@ footer {
   gap: 2rem;
 }
 
+.skill-name{
+  display: flex;
+}
+
 .skill-form form > * {
   width: 100%;
   box-sizing: border-box;  /* include padding/border in total width */

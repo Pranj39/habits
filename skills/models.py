@@ -38,12 +38,12 @@ class Node(models.Model):
         return super().save(*args, **kwargs)
     
     def get_c(self):
-        self.c = {"name":"","children":[],"id":0}
+        self.c = {"name":"","id":0,"children":[]}
         self.c["name"] = self.name
+        self.c['id'] = self.id
         for node in Node.objects.all():
             if node.parent == self:
                 self.c["children"].append(node.get_c())
-        self.c['id'] = self.id
         self.c['activated'] = self.activated
         self.c['root_node'] = self.root_node
         self.c['skill_points_required'] = self.skill_points_required

@@ -174,7 +174,7 @@
             .attr("y", d => d.children ? -20 : 20)
             .style("text-anchor", d => d.children ? "end" : "start")
             .style("font", "16px sans-serif")
-            .text(d => `${d.data.name} (Exp: ${d.data.skill_points_required})`);
+            .text(d => `${d.data.name} (Skill Points: ${d.data.skill_points_required})`);
     }
 
     main();
